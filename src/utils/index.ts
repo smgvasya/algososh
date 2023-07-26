@@ -1,23 +1,21 @@
-const swap = (arr: number[], a: number, b: number): void => {
+import { StrReversType } from "../types/types";
+
+const swap = (arr: StrReversType[] | number[], a: number, b: number): void => {
   const temp = arr[a];
   arr[a] = arr[b];
   arr[b] = temp;
 };
 
-const Compare = {
-  LESS_THAN: -1,
-  BIGGER_THAN: 1,
-};
-
-const defaultCompare = (a: any, b: any): number => {
+const defaultCompare = (a: number, b: number): number | boolean => {
   if (a === b) {
     return 0;
   }
-  return a < b ? Compare.LESS_THAN : Compare.BIGGER_THAN;
-};
+  return a > b && -1;
+}
 
 const delay = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((res) => setTimeout(res, ms));
 };
 
 export { swap, defaultCompare, delay };
+

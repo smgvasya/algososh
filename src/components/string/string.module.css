@@ -6,3 +6,15 @@
   padding-bottom: 120px;
   gap: 12px;
 }
+
+.container{
+  list-style-type: none;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.circles {
+  display: flex;
+  justify-content: center;
+  gap: 16px; 
+}

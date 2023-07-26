@@ -1,66 +1,62 @@
-import { useState, SyntheticEvent, ChangeEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import styles from "./string.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
-import { DELAY_IN_MS } from "../../utils/constants/delays";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { ElementStates } from "../../types/element-states";
+import { StrReversType } from "../../types/types";
+import { swap, delay } from "../../utils/index";
 
 export const StringComponent: React.FC = () => {
   const [value, setValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [reverse, setReverse] = useState<StrReversType[]>([]);
 
-  // const reverse = (str: string | number) => {
-  //   const splitStr = str.toString().split("");
-  //   return splitStr.reverse();
-  // };
-
-  const reverseStr = () => {
+  const reverseStr = async (str: string) => {
     setIsLoading(true);
-    const arr = value.toString().split("");
-    
+    const arr = str
+      .split("")
+      .map((item) => ({ item, state: ElementStates.Default }));
+    const { length } = arr;
+
     let start = 0;
-    let end = arr.length - 1;
-    const mid = Math.floor((end - start) / 2 + start)
+    let end = length - 1;
+    setReverse([...arr]);
 
-    while(start < end){
-      
+    while (start <= end) {
+      await delay(DELAY_IN_MS);
+
+      arr[start].state = ElementStates.Changing;
+      arr[end].state = ElementStates.Changing;
+      setReverse([...arr]);
+      await delay(SHORT_DELAY_IN_MS);
+
+      swap(arr, start, end);
+
+      arr[start].state = ElementStates.Modified;
+      arr[end].state = ElementStates.Modified;
+      setReverse([...arr]);
+      start++;
+      end--;
     }
-  }
-  
- //функция для перестановки символов и замены цвета circle
-const swap = async (
-  arr: { letter: string; color: ElementStates }[],
-  firstIndex: number,
-  secondIndex: number,
-  color: ElementStates
-) => {
-  const temp = arr[firstIndex];
-  //изменяем цвет circle, с которыми производим действие
-  arr[firstIndex].color = color;
-  arr[secondIndex].color = color;
-  //пауза для визуализации переключения цвета circle
-  await new Promise((resolve) => setTimeout(resolve, DELAY_IN_MS));
-  if (firstIndex <= secondIndex) {
-    arr[firstIndex] = arr[secondIndex];
-    arr[secondIndex] = temp;
-  }
-  arr[firstIndex].color = ElementStates.Modified;
-  arr[secondIndex].color = ElementStates.Modified;
-  return arr;
-};
+    setIsLoading(false);
+  };
 
-
-
-
-  const onChange = (evt: ChangeEvent<HTMLInputElement>)=> {
+  const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
-  }
+  };
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    reverseStr(value);
+    setValue("");
+  };
 
   return (
     <SolutionLayout title="Строка">
-      <form className={styles.form}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <Input
           maxLength={11}
           isLimitText={true}
@@ -70,11 +66,19 @@ const swap = async (
         <Button
           text="Развернуть"
           type="submit"
-          onClick={reverseStr}
-          //isLoader={isLoading}
-          disabled = {value.length === 0 ? true : false}
+          isLoader={isLoading}
+          disabled={value.length === 0 ? true : false}
         />
       </form>
+      {reverse && (
+        <ul className={styles.container}>
+          <li className={styles.circles}>
+            {reverse.map((item) => (
+              <Circle letter={item.item} state={item.state}></Circle>
+            ))}
+          </li>
+        </ul>
+      )}
     </SolutionLayout>
   );
 };
