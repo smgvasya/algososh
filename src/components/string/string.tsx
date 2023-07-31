@@ -72,11 +72,11 @@ export const StringComponent: React.FC = () => {
       </form>
       {reverse && (
         <ul className={styles.container}>
-          <li className={styles.circles}>
-            {reverse.map((item) => (
+          {reverse.map((item, index) => (
+            <li className={styles.circles} key={index}>
               <Circle letter={item.item} state={item.state}></Circle>
-            ))}
-          </li>
+            </li>
+          ))}
         </ul>
       )}
     </SolutionLayout>

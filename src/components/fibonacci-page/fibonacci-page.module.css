@@ -3,15 +3,16 @@
   margin: 0 auto;
   max-width: 522px;
   max-height: 86px;
-  padding-bottom: 120px;
+  padding-bottom: 90px;
   gap: 12px;
 }
 
 .container {
-  list-style-type: none;
+  width: 950px;
   margin: 0 auto;
   padding: 0;
   display: flex;
-  justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 40px 16px;
+  list-style-type: none;
 }

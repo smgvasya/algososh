@@ -8,12 +8,12 @@ import { SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { delay } from "../../utils/index";
 
 export const FibonacciPage: React.FC = () => {
-  const [value, setValue] = useState<number>();
+  const [value, setValue] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [fibonacci, setFibonacci] = useState<number[]>([]);
 
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setValue(Number(evt.target.value));
+    setValue(evt.target.value);
   };
 
   const fibonacciCalc = (index: number): number => {
@@ -42,8 +42,8 @@ export const FibonacciPage: React.FC = () => {
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    fibonacciRender(value as number);
-    setValue(0);
+    fibonacciRender(Number(value));
+    setValue("");
   };
 
   return (
@@ -67,7 +67,7 @@ export const FibonacciPage: React.FC = () => {
       {fibonacci && (
         <ul className={styles.container}>
           {fibonacci.map((item, index) => (
-            <li className={styles.circles} key={index}>
+            <li key={index} className={styles.circles}>
               <Circle letter={item} index={index}></Circle>
             </li>
           ))}
