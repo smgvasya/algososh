@@ -1,29 +1,30 @@
-import { useState, ChangeEvent, FormEvent,  useMemo } from "react";
+import { useState, ChangeEvent, FormEvent, useMemo } from "react";
 import styles from "./stack-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
-import { SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
+import { SUPER_SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { delay } from "../../utils/index";
 import { Stack } from "./Stack";
 
-type CircleType = {
+type StackType = {
   value: number | string;
   state: ElementStates;
 };
 
 export const StackPage: React.FC = () => {
   const [value, setValue] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [stackState, setStackState] = useState<CircleType[]>([]);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [isRemoving, setIsRemoving] = useState<boolean>(false);
+  const [stackState, setStackState] = useState<StackType[]>([]);
 
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
   };
 
-  const stack  = useMemo(() => new Stack<CircleType>(), []);
+  const stack = useMemo(() => new Stack<StackType>(), []);
 
   const clear = () => {
     stack.clear();
@@ -31,34 +32,32 @@ export const StackPage: React.FC = () => {
   };
 
   const remove = async () => {
-    setIsLoading(true);
+    setIsRemoving(true);
     const top = stack.peak();
     top!.state = ElementStates.Changing;
-    await delay(SHORT_DELAY_IN_MS);
+    await delay(SUPER_SHORT_DELAY_IN_MS);
     stack.pop();
     setStackState([...stack.getElements()]);
-    setIsLoading(false);
+    setIsRemoving(false);
   };
 
-  const add = async (value:string) => {
-    setIsLoading(true);
-    const head = {value: value, state: ElementStates.Changing}
+  const add = async (value: string) => {
+    setIsAdding(true);
+    const head = { value: value, state: ElementStates.Changing };
     stack.push(head);
     setStackState([...stack.getElements()]);
-    await delay(SHORT_DELAY_IN_MS);
-
+    await delay(SUPER_SHORT_DELAY_IN_MS);
     const top = stack.peak();
     top!.state = ElementStates.Default;
     setStackState([...stack.getElements()]);
-    setIsLoading(false);
-  }
+    setIsAdding(false);
+  };
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     add(value);
     setValue("");
   };
-
 
   return (
     <SolutionLayout title="Стек">
@@ -75,13 +74,13 @@ export const StackPage: React.FC = () => {
             <Button
               text="Добавить"
               type="submit"
-              isLoader={isLoading}
+              isLoader={isAdding}
               disabled={!value}
             />
             <Button
               text="Удалить"
               type="submit"
-              isLoader={isLoading}
+              isLoader={isRemoving}
               onClick={remove}
               disabled={!stackState.length}
             />
@@ -89,7 +88,6 @@ export const StackPage: React.FC = () => {
           <Button
             text="Очистить"
             type="reset"
-            isLoader={isLoading}
             onClick={clear}
             disabled={!stackState.length}
           />
@@ -99,12 +97,16 @@ export const StackPage: React.FC = () => {
         <ul className={styles.container_result}>
           {stackState?.map((item, index) => (
             <li key={index} className={styles.circles}>
-              <Circle letter={item.value || ''} index={index}> state={item.state}  head={index === stack.size() - 1 ? "top" : null} </Circle> 
+              <Circle
+                letter={item.value || ""}
+                index={index}
+                state={item.state}
+                head={index === stack.size() - 1 && "top"}
+              ></Circle>
             </li>
           ))}
         </ul>
       )}
-    </SolutionLayout>   
-
+    </SolutionLayout>
   );
 };

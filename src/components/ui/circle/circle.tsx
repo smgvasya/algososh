@@ -5,9 +5,9 @@ import { ElementStates } from "../../../types/element-states";
 interface CircleProps {
   state?: ElementStates;
   letter?: string | number;
-  head?: string | React.ReactElement | null;
+  head?: string | React.ReactElement | null | boolean;
   index?: number;
-  tail?: string | React.ReactElement | null;
+  tail?: string | React.ReactElement | null | boolean;
   tailType?: "string" | "element";
   extraClass?: string;
   isSmall?: boolean;
