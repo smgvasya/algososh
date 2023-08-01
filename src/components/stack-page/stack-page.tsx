@@ -1,50 +1,64 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent,  useMemo } from "react";
 import styles from "./stack-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
+import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { delay } from "../../utils/index";
+import { Stack } from "./Stack";
+
+type CircleType = {
+  value: number | string;
+  state: ElementStates;
+};
 
 export const StackPage: React.FC = () => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [fibonacci, setFibonacci] = useState<number[]>([]);
+  const [stackState, setStackState] = useState<CircleType[]>([]);
 
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
   };
 
-  const fibonacciCalc = (index: number): number => {
-    if (index < 0) {
-      throw new Error("число не может быть меньше нуля");
-    }
-    if (index === 0) {
-      return 0;
-    }
-    if (index === 1) {
-      return 1;
-    }
-    return fibonacciCalc(index - 1) + fibonacciCalc(index - 2);
+  const stack  = useMemo(() => new Stack<CircleType>(), []);
+
+  const clear = () => {
+    stack.clear();
+    setStackState([]);
   };
 
-  const fibonacciRender = async (index: number) => {
+  const remove = async () => {
     setIsLoading(true);
-    const arr: number[] = [];
-    for (let i = 1; i <= index + 1; i++) {
-      await delay(SHORT_DELAY_IN_MS);
-      arr.push(fibonacciCalc(i));
-      setFibonacci([...arr]);
-    }
+    const top = stack.peak();
+    top!.state = ElementStates.Changing;
+    await delay(SHORT_DELAY_IN_MS);
+    stack.pop();
+    setStackState([...stack.getElements()]);
     setIsLoading(false);
   };
 
+  const add = async (value:string) => {
+    setIsLoading(true);
+    const head = {value: value, state: ElementStates.Changing}
+    stack.push(head);
+    setStackState([...stack.getElements()]);
+    await delay(SHORT_DELAY_IN_MS);
+
+    const top = stack.peak();
+    top!.state = ElementStates.Default;
+    setStackState([...stack.getElements()]);
+    setIsLoading(false);
+  }
+
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    fibonacciRender(Number(value));
+    add(value);
     setValue("");
   };
+
 
   return (
     <SolutionLayout title="Стек">
@@ -68,27 +82,29 @@ export const StackPage: React.FC = () => {
               text="Удалить"
               type="submit"
               isLoader={isLoading}
-              extraClass={styles.delete}
-              //disabled={!value} // если длина массива стека не 0
+              onClick={remove}
+              disabled={!stackState.length}
             />
           </div>
           <Button
             text="Очистить"
             type="reset"
             isLoader={isLoading}
-            //disabled={!value} // если длина массива стека не 0
+            onClick={clear}
+            disabled={!stackState.length}
           />
         </div>
       </form>
-      {/* {fibonacci && (
+      {stackState && (
         <ul className={styles.container_result}>
-          {fibonacci.map((item, index) => (
+          {stackState?.map((item, index) => (
             <li key={index} className={styles.circles}>
-              <Circle letter={item} index={index}> head={head}</Circle> 
+              <Circle letter={item.value || ''} index={index}> state={item.state}  head={index === stack.size() - 1 ? "top" : null} </Circle> 
             </li>
           ))}
         </ul>
-      )} */}
-    </SolutionLayout>
+      )}
+    </SolutionLayout>   
+
   );
 };
