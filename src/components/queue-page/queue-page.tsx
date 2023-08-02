@@ -12,19 +12,21 @@ import { Queue } from "./Queue";
 type QueueType = {
   value: number | string;
   state: ElementStates;
+  head?: string | JSX.Element | undefined;
+  tail?: string | JSX.Element | undefined;
 };
 
 export const QueuePage: React.FC = () => {
   const [value, setValue] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
-  const [stackState, setStackState] = useState<QueueType[]>([]);
+  const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
 
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
   };
 
-  const stack = useMemo(() => new Queue<QueueType>(), []);
+  const stack = useMemo(() => new Queue<QueueType>(7), []);
 
   const clear = () => {
     stack.clear();
