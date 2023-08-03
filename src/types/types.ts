@@ -26,12 +26,8 @@ export type QueueType<T> = {
 };
 
 export type LinkedListType<T> = {
-  enqueue: (item: T) => void;
-  dequeue: () => void;
-  peak: () => T | null;
-  clear: () => void;
-  getElements: () => (T | null)[];
-  getHead: () => number;
-  getTail: () => number;
-  isEmpty: () => boolean;
+  append: (element: T) => void;
+  insertAt: (element: T, position: number) => void;
+  getSize: () => number;
+  print: () => void;
 };

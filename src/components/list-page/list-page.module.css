@@ -1,29 +1,34 @@
 .form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 60px;
-  }
-  
-  .container {
-    display: flex;
-    gap: 80px;
-  }
-  
-  .control {
-    display: flex;
-    width: 660px;
-    gap: 12px;
-  }
-  
-  .container_result {
-    width: 950px;
-    margin: 0 auto;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 40px 16px;
-    list-style-type: none;
-  }
-  
+  display: flex;
+  width: 952px;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 60px;
+}
+
+.container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.button_sml {
+  min-width: 175px;
+}
+
+.button_big {
+  min-width: 362px;
+}
+
+.container_result {
+  width: 950px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px 16px;
+  list-style-type: none;
+}

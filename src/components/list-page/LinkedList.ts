@@ -1,61 +1,77 @@
 import { LinkedListType } from "../../types/types";
 
+export class Node<T> {
+  value: T;
+  next: Node<T> | null;
+  constructor(value: T, next?: Node<T> | null) {
+    this.value = value;
+    this.next = next === undefined ? null : next;
+  }
+}
+
 export class LinkedList<T> implements LinkedListType<T> {
-  container: (T | null)[] = [];
-  head = 0;
-  tail = 0;
-  private readonly size: number = 0;
-  length: number = 0;
-
-  constructor(size: number) {
-    this.size = size;
-    this.container = Array(size);
+  private head: Node<T> | null;
+  private size: number;
+  constructor() {
+    this.head = null;
+    this.size = 0;
   }
 
-  enqueue(item: T) {
-    if (this.length >= this.size) {
-      throw new Error("Элементов сюда, ты не добавишь больше");
+  insertAt(element: T, index: number) {
+    if (index < 0 || index > this.size) {
+      console.log("Enter a valid index");
+      return;
+    } else if (this.head) {
+      const node = new Node(element);
+      if (index === 0) {
+        node.next = this.head;
+        this.head = node;
+      } else {
+        let curr = this.head;
+        let currIndex = 0;
+
+        while (currIndex + 1 < index && curr.next) {
+          curr = curr.next;
+          currIndex += 1;
+        }
+
+        const trav = curr.next;
+        curr.next = node;
+        node.next = trav;
+      }
+
+      this.size++;
     }
-
-    this.container[this.tail % this.size] = item;
-    this.tail++;
-    this.length++;
   }
 
-  dequeue() {
-    if (this.isEmpty()) {
-      throw new Error("В очереди пустоту, вижу я");
+  append(element: T) {
+    const node = new Node(element);
+    let current;
+
+    if (this.head === null) {
+      this.head = node;
+    } else {
+      current = this.head;
+      while (current.next) {
+        current = current.next;
+      }
+
+      current.next = node;
     }
-    const firstElem = this.container[this.head % this.size];
-    this.container[this.head % this.size] = null;
-
-    this.head++;
-    this.length--;
-    return firstElem;
+    this.size++;
   }
 
-  peak() {
-    return this.container[this.head % this.size];
+  getSize() {
+    return this.size;
   }
 
-  clear() {
-    this.length = 0;
-    this.head = 0;
-    this.tail = 0;
-    this.container = Array(this.size);
+  print() {
+    let curr = this.head;
+    let res = "";
+    while (curr) {
+      res += `${curr.value} `;
+      curr = curr.next;
+    }
+    console.log(res);
   }
-
-  getElements() {
-    return this.container;
-  }
-
-  getHead() {
-    return this.head;
-  }
-
-  getTail() {
-    return this.tail - 1;
-  }
-
-  isEmpty = () => this.length === 0;
 }

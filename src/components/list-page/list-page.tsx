@@ -19,148 +19,154 @@ type QueueType = {
 type QueueInitType = { value: string; state: ElementStates };
 
 export const ListPage: React.FC = () => {
-  const [value, setValue] = useState<string>("");
-  const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [isRemoving, setIsRemoving] = useState<boolean>(false);
-  const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
-  const queue = useMemo(() => new LinkedList<QueueType>(7), []);
+  // const [value, setValue] = useState<string>("");
+  // const [isAdding, setIsAdding] = useState<boolean>(false);
+  // const [isRemoving, setIsRemoving] = useState<boolean>(false);
+  // const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
+  // const queue = useMemo(() => new LinkedList<QueueType>(7), []);
 
-  const initialQueue: QueueInitType = {
-    value: "",
-    state: ElementStates.Default,
-  };
+  // const initialQueue: QueueInitType = {
+  //   value: "",
+  //   state: ElementStates.Default,
+  // };
 
-  const initialQueueCircles = useMemo(
-    () => queue.getElements().fill(initialQueue),
-    [queue]
-  );
+  // const initialQueueCircles = useMemo(
+  //   () => queue.getElements().fill(initialQueue),
+  //   [queue]
+  // );
 
-  useEffect(() => {
-    setQueueState(initialQueueCircles);
-  }, [initialQueueCircles]);
+  // useEffect(() => {
+  //   setQueueState(initialQueueCircles);
+  // }, [initialQueueCircles]);
 
-  const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setValue(evt.target.value);
-  };
+  // const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
+  //   setValue(evt.target.value);
+  // };
 
-  const clear = () => {
-    queue.clear();
-    setQueueState([...queue.getElements()]);
-  };
+  // const clear = () => {
+  //   queue.clear();
+  //   setQueueState([...queue.getElements()]);
+  // };
 
-  const remove = async () => {
-    setIsRemoving(true);
-    const head = queue.getTail();
-    const tail = queue.getHead();
-    if (head === tail) {
-      clear();
-      setIsRemoving(false);
-    } else {
-      const top = queue.peak();
-      top!.state = ElementStates.Changing;
-      setQueueState([...queue.getElements()]);
-      await delay(SUPER_SHORT_DELAY_IN_MS);
-      queue.dequeue();
-      setQueueState([...queue.getElements()]);
+  // const remove = async () => {
+  //   setIsRemoving(true);
+  //   const head = queue.getTail();
+  //   const tail = queue.getHead();
+  //   if (head === tail) {
+  //     clear();
+  //     setIsRemoving(false);
+  //   } else {
+  //     const top = queue.peak();
+  //     top!.state = ElementStates.Changing;
+  //     setQueueState([...queue.getElements()]);
+  //     await delay(SUPER_SHORT_DELAY_IN_MS);
+  //     queue.dequeue();
+  //     setQueueState([...queue.getElements()]);
 
-      setIsRemoving(false);
-    }
-  };
+  //     setIsRemoving(false);
+  //   }
+  // };
 
-  const add = async (value: string) => {
-    setIsAdding(true);
-    const container = queue.getElements();
-    const head = { value: value, state: ElementStates.Changing };
-    queue.enqueue(head);
-    setQueueState([...container]);
-    await delay(SUPER_SHORT_DELAY_IN_MS);
-    const element = container[queue.getTail()];
-    element!.state = ElementStates.Default;
-    setQueueState([...container]);
+  // const add = async (value: string) => {
+  //   setIsAdding(true);
+  //   const container = queue.getElements();
+  //   const head = { value: value, state: ElementStates.Changing };
+  //   queue.enqueue(head);
+  //   setQueueState([...container]);
+  //   await delay(SUPER_SHORT_DELAY_IN_MS);
+  //   const element = container[queue.getTail()];
+  //   element!.state = ElementStates.Default;
+  //   setQueueState([...container]);
 
-    setIsAdding(false);
-  };
+  //   setIsAdding(false);
+  // };
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    add(value);
-    setValue("");
-  };
+  // const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+  //   evt.preventDefault();
+  //   add(value);
+  //   setValue("");
+  // };
 
   return (
     <SolutionLayout title="Связный список">
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form className={styles.form}>
         <div className={styles.container}>
-          <div className={styles.control}>
-            <Input
-              placeholder="Введите значение"
-              maxLength={4}
-              isLimitText={true}
-              value={value}
-              onChange={onChange}
-            />
-            <Button
-              text="Добавить в head"
-              type="submit"
-              isLoader={isAdding}
-              disabled={!value || queue.length === 7}
-            />
-            <Button
-              text="Добавить в tail"
-              type="submit"
-              isLoader={isAdding}
-              disabled={!value || queue.length === 7}
-            />
-            <Button
-              text="Удалить из head"
-              type="submit"
-              isLoader={isRemoving}
-              onClick={remove}
-              disabled={queue.isEmpty()}
-            />
-            <Button
-              text="Удалить из tail"
-              type="submit"
-              isLoader={isRemoving}
-              onClick={remove}
-              disabled={queue.isEmpty()}
-            />
-          </div>
           <Input
-            placeholder="Введите индекс"
+            placeholder="Введите значение"
             maxLength={4}
             isLimitText={true}
-            value={value}
-            onChange={onChange}
+            // value={value}
+            // onChange={onChange}
+          />
+          <Button
+            text="Добавить в head"
+            type="submit"
+            extraClass = {styles.button_sml}
+            // isLoader={isAdding}
+            //   disabled={!value || queue.length === 7}
+          />
+          <Button
+            text="Добавить в tail"
+            type="submit"
+            extraClass = {styles.button_sml}
+            // isLoader={isAdding}
+            //  disabled={!value || queue.length === 7}
+          />
+          <Button
+            text="Удалить из head"
+            type="submit"
+            extraClass = {styles.button_sml}
+            // isLoader={isRemoving}
+            // onClick={remove}
+            //  disabled={queue.isEmpty()}
+          />
+          <Button
+            text="Удалить из tail"
+            type="submit"
+            extraClass = {styles.button_sml}
+            // isLoader={isRemoving}
+            // onClick={remove}
+            //  disabled={queue.isEmpty()}
+          />
+        </div>
+        <div className={styles.container}>
+          <Input
+            placeholder="Введите индекс"
+            type="number"
+            isLimitText={false}
+            // value={value}
+            // onChange={onChange}
           />
           <Button
             text="Добавить по индексу"
+            extraClass = {styles.button_big}
             type="submit"
-            isLoader={isAdding}
-            disabled={!value || queue.length === 7}
+            //  isLoader={isAdding}
+            // disabled={!value || queue.length === 7}
           />
           <Button
             text="Удалить по индексу"
             type="submit"
-            isLoader={isRemoving}
-            onClick={remove}
-            disabled={queue.isEmpty()}
+            extraClass = {styles.button_big}
+            // isLoader={isRemoving}
+            // onClick={remove}
+            //disabled={queue.isEmpty()}
           />
         </div>
       </form>
 
       <ul className={styles.container_result}>
-        {queueState?.map((item, index) => (
+        {/* {queueState?.map((item, index) => (
           <li key={index} className={styles.circles}>
             <Circle
               letter={item?.value || ""}
               index={index}
               state={item?.state}
-              head={index === queue.getHead() && !queue.isEmpty() ? "head" : ""}
-              tail={index === queue.getTail() && !queue.isEmpty() ? "tail" : ""}
+              // head={index === queue.getHead() && !queue.isEmpty() ? "head" : ""}
+              // tail={index === queue.getTail() && !queue.isEmpty() ? "tail" : ""}
             ></Circle>
           </li>
-        ))}
+        ))} */}
       </ul>
     </SolutionLayout>
   );
