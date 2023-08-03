@@ -24,3 +24,14 @@ export type QueueType<T> = {
   getTail: () => number;
   isEmpty: () => boolean;
 };
+
+export type LinkedListType<T> = {
+  enqueue: (item: T) => void;
+  dequeue: () => void;
+  peak: () => T | null;
+  clear: () => void;
+  getElements: () => (T | null)[];
+  getHead: () => number;
+  getTail: () => number;
+  isEmpty: () => boolean;
+};
