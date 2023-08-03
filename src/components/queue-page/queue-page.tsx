@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useMemo } from "react";
+import { useState, ChangeEvent, FormEvent, useMemo, useEffect } from "react";
 import styles from "./queue-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
@@ -10,48 +10,74 @@ import { delay } from "../../utils/index";
 import { Queue } from "./Queue";
 
 type QueueType = {
-  value: number | string;
+  value: string;
   state: ElementStates;
-  head?: string | JSX.Element | undefined;
-  tail?: string | JSX.Element | undefined;
+  head?: string | React.ReactElement;
+  tail?: string | React.ReactElement;
 };
+
+type QueueInitType = { value: string; state: ElementStates };
 
 export const QueuePage: React.FC = () => {
   const [value, setValue] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
+  const queue = useMemo(() => new Queue<QueueType>(7), []);
+
+  const initialQueue: QueueInitType = {
+    value: "",
+    state: ElementStates.Default,
+  };
+
+  const initialQueueCircles = useMemo(
+    () => queue.getElements().fill(initialQueue),
+    [queue]
+  );
+
+  useEffect(() => {
+    setQueueState(initialQueueCircles);
+  }, [initialQueueCircles]);
 
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
   };
 
-  const stack = useMemo(() => new Queue<QueueType>(7), []);
-
   const clear = () => {
-    stack.clear();
-    setStackState([]);
+    queue.clear();
+    setQueueState([...queue.getElements()]);
   };
 
   const remove = async () => {
     setIsRemoving(true);
-    const top = stack.peak();
-    top!.state = ElementStates.Changing;
-    await delay(SUPER_SHORT_DELAY_IN_MS);
-    stack.pop();
-    setStackState([...stack.getElements()]);
-    setIsRemoving(false);
+    const head = queue.getTail();
+    const tail = queue.getHead();
+    if (head === tail) {
+      clear();
+      setIsRemoving(false);
+    } else {
+      const top = queue.peak();
+      top!.state = ElementStates.Changing;
+      setQueueState([...queue.getElements()]);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
+      queue.dequeue();
+      setQueueState([...queue.getElements()]);
+
+      setIsRemoving(false);
+    }
   };
 
   const add = async (value: string) => {
     setIsAdding(true);
+    const container = queue.getElements();
     const head = { value: value, state: ElementStates.Changing };
-    stack.push(head);
-    setStackState([...stack.getElements()]);
+    queue.enqueue(head);
+    setQueueState([...container]);
     await delay(SUPER_SHORT_DELAY_IN_MS);
-    const top = stack.peak();
-    top!.state = ElementStates.Default;
-    setStackState([...stack.getElements()]);
+    const element = container[queue.getTail()];
+    element!.state = ElementStates.Default;
+    setQueueState([...container]);
+
     setIsAdding(false);
   };
 
@@ -77,38 +103,38 @@ export const QueuePage: React.FC = () => {
               text="Добавить"
               type="submit"
               isLoader={isAdding}
-              disabled={!value}
+              disabled={!value || queue.length === 7}
             />
             <Button
               text="Удалить"
               type="submit"
               isLoader={isRemoving}
               onClick={remove}
-              disabled={!stackState.length}
+              disabled={queue.isEmpty()}
             />
           </div>
           <Button
             text="Очистить"
             type="reset"
             onClick={clear}
-            disabled={!stackState.length}
+            disabled={queue.isEmpty()}
           />
         </div>
       </form>
-      {stackState && (
-        <ul className={styles.container_result}>
-          {stackState?.map((item, index) => (
-            <li key={index} className={styles.circles}>
-              <Circle
-                letter={item.value || ""}
-                index={index}
-                state={item.state}
-                head={index === stack.size() - 1 && "top"}
-              ></Circle>
-            </li>
-          ))}
-        </ul>
-      )}
+
+      <ul className={styles.container_result}>
+        {queueState?.map((item, index) => (
+          <li key={index} className={styles.circles}>
+            <Circle
+              letter={item?.value || ""}
+              index={index}
+              state={item?.state}
+              head={index === queue.getHead() && !queue.isEmpty() ? "head" : ""}
+              tail={index === queue.getTail() && !queue.isEmpty() ? "tail" : ""}
+            ></Circle>
+          </li>
+        ))}
+      </ul>
     </SolutionLayout>
   );
 };

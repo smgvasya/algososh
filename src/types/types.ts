@@ -18,8 +18,9 @@ export type QueueType<T> = {
   enqueue: (item: T) => void;
   dequeue: () => void;
   peak: () => T | null;
-  //clear: () => void;
-  //size: number;
+  clear: () => void;
+  getElements: () => (T | null)[];
+  getHead: () => number;
+  getTail: () => number;
+  isEmpty: () => boolean;
 };
-
-// export type TStackNode<T> = {value: T, status: ElementStates}
