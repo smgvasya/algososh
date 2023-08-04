@@ -30,4 +30,6 @@ export type LinkedListType<T> = {
   insertAt: (element: T, position: number) => void;
   getSize: () => number;
   print: () => void;
+  // findElement: (index: number) => void;
+  removeAt: (index: number) => void;
 };

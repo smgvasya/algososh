@@ -74,4 +74,30 @@ export class LinkedList<T> implements LinkedListType<T> {
     }
     console.log(res);
   }
+
+  removeAt(index: number) {
+    if (index < 0 || index > this.size) {
+      throw new Error("Enter a valid index");
+    }
+
+    let curr = this.head;
+
+    if (curr && index === 0) {
+      this.head = curr.next;
+    } else {
+      for (let i = 0; curr != null && i < index - 1; i += 1) {
+        curr = curr.next;
+      }
+
+      if (curr == null || curr.next == null) {
+        return null;
+      }
+
+      const { next } = curr.next;
+
+      curr.next = next;
+    }
+
+    this.size -= 1;
+  }
 }

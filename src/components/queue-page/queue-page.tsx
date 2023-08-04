@@ -16,8 +16,6 @@ type QueueType = {
   tail?: string | React.ReactElement;
 };
 
-type QueueInitType = { value: string; state: ElementStates };
-
 export const QueuePage: React.FC = () => {
   const [value, setValue] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false);
@@ -25,7 +23,7 @@ export const QueuePage: React.FC = () => {
   const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
   const queue = useMemo(() => new Queue<QueueType>(7), []);
 
-  const initialQueue: QueueInitType = {
+  const initialQueue = {
     value: "",
     state: ElementStates.Default,
   };
