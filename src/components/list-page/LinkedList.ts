@@ -32,7 +32,7 @@ export class LinkedList<T> implements LinkedListType<T> {
 
         while (currIndex + 1 < index && curr.next) {
           curr = curr.next;
-          currIndex += 1;
+          currIndex++;
         }
 
         const trav = curr.next;
@@ -59,10 +59,6 @@ export class LinkedList<T> implements LinkedListType<T> {
       current.next = node;
     }
     this.size++;
-  }
-
-  getSize() {
-    return this.size;
   }
 
   print() {
@@ -98,6 +94,55 @@ export class LinkedList<T> implements LinkedListType<T> {
       curr.next = next;
     }
 
-    this.size -= 1;
+    this.size--;
+  }
+
+  removeHead() {
+    if (!this.head) {
+      return;
+    }
+    let curr = this.head;
+    this.head = curr.next;
+    this.size--;
+  }
+
+  removeTail() {
+    if (!this.head) {
+      return;
+    }
+    let curr = this.head;
+    let prev = curr;
+    while (curr.next) {
+      prev = curr;
+      curr = curr.next;
+    }
+    prev.next = null;
+    this.size--;
+  }
+
+  removeByIndex(index: number) {
+    if (index < 0 || index > this.size) {
+      return;
+    } else {
+      if (index === 0) {
+        this.removeHead();
+      } else {
+        let curr = this.head;
+        let currIndex = 0;
+
+        while (currIndex < index - 1 && curr && curr.next) {
+          currIndex++;
+          curr = curr.next;
+        }
+        if (curr && curr.next) {
+          curr.next = curr.next.next;
+        }
+        this.size--;
+      }
+    }
+  }
+
+  getSize() {
+    return this.size;
   }
 }

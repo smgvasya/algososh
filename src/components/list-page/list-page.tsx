@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useMemo, useEffect } from "react";
+import { useState, ChangeEvent, useMemo, useEffect } from "react";
 import styles from "./list-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
@@ -14,11 +14,16 @@ import {
 import { delay } from "../../utils/index";
 import { LinkedList } from "./LinkedList";
 
+type ListСircleType = {
+  value: string;
+  state: ElementStates;
+  type: "top" | "bottom";
+};
+
 type ListType = {
   value: string;
   state: ElementStates;
-  circleTop?: "top";
-  circleBottom?: "bottom";
+  circle?: ListСircleType | null;
 };
 
 const initialStateLoading = {
@@ -54,101 +59,131 @@ export const ListPage: React.FC = () => {
   const addToHead = async () => {
     setIsLoading({ ...initialStateLoading, loadingAddHead: true });
     list.insertAt(inputValue, 0);
-    if (listState.length) {
-      listState[0] = {
+
+    const { length } = listState;
+
+    if (length) {
+      listState[0].circle = {
         value: inputValue,
-        circleTop: "top",
         state: ElementStates.Changing,
+        type: "top",
       };
     }
+
     setListState([...listState]);
-    await delay(SHORT_DELAY_IN_MS);
+    await delay(SUPER_SHORT_DELAY_IN_MS);
+
     if (listState[0]) {
-      listState[0] = {
-        ...listState[0],
-        circleTop: undefined,
-      };
+      delete listState[0].circle;
     }
+
     listState.unshift({
       ...listState[0],
       value: inputValue,
       state: ElementStates.Modified,
     });
+
     setListState([...listState]);
-    await delay(SHORT_DELAY_IN_MS);
+    await delay(SUPER_SHORT_DELAY_IN_MS);
+
     listState[0].state = ElementStates.Default;
     setListState([...listState]);
+    setInputValue("");
     setIsLoading({ ...initialStateLoading, loadingAddHead: false });
   };
 
   const addToTail = async () => {
     setIsLoading({ ...initialStateLoading, loadingAddTail: true });
     list.append(inputValue);
-    let index = listState.length - 1;
-    listState[index] = {
-      ...listState[index],
-      value: inputValue,
-      circleBottom: "bottom",
-      state: ElementStates.Changing,
+
+    const { length } = listState;
+
+    let lastIndex = length - 1;
+
+    listState[lastIndex] = {
+      ...listState[lastIndex],
+      circle: {
+        value: inputValue,
+        state: ElementStates.Changing,
+        type: "top",
+      },
     };
     setListState([...listState]);
-    await delay(SHORT_DELAY_IN_MS);
+    await delay(SUPER_SHORT_DELAY_IN_MS);
 
-    listState[index] = {
-      ...listState[index],
-      circleBottom: undefined,
+    listState[lastIndex] = {
+      ...listState[lastIndex],
+      circle: undefined,
     };
+
     listState.push({
-      //...listState[index],
       value: inputValue,
       state: ElementStates.Modified,
+      circle: undefined,
     });
+
     setListState([...listState]);
-    await delay(SHORT_DELAY_IN_MS);
-    listState[listState.length].state = ElementStates.Default;
+    await delay(SUPER_SHORT_DELAY_IN_MS);
+
+    listState[length].state = ElementStates.Default;
+
     setListState([...listState]);
+    setInputValue("");
     setIsLoading({ ...initialStateLoading, loadingAddTail: false });
   };
 
   const removeHead = async () => {
     setIsLoading({ ...initialStateLoading, loadingRemHead: true });
-
     if (listState[0]) {
       listState[0] = {
         ...listState[0],
-        value: listState[0].value || "",
-        circleTop: "top",
-        state: ElementStates.Changing,
+        value: "",
+        state: ElementStates.Default,
+        circle: {
+          value: listState[0].value || "",
+          state: ElementStates.Changing,
+          type: "bottom",
+        },
       };
-      list.removeAt(0);
 
       setListState([...listState]);
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
+
+      list.removeHead();
 
       listState.shift();
       setListState([...listState]);
     }
+
     setIsLoading({ ...initialStateLoading, loadingRemHead: false });
   };
 
   const removeTail = async () => {
     setIsLoading({ ...initialStateLoading, loadingRemTail: true });
-    let index = listState.length - 1;
-    if (listState[index]) {
-      listState[index] = {
-        ...listState[index],
-        value: listState[index].value || "",
-        circleBottom: "bottom",
-        state: ElementStates.Changing,
-      };
-    }
-    list.removeAt(index);
-    setListState([...listState]);
-    await delay(SHORT_DELAY_IN_MS);
 
-    listState.pop();
-    setListState([...listState]);
-    setIsLoading({ ...initialStateLoading, loadingRemTail: true });
+    const { length } = listState;
+    let lastIndex = length - 1;
+
+    if (listState[lastIndex]) {
+      listState[lastIndex] = {
+        ...listState[lastIndex],
+        value: "",
+        state: ElementStates.Default,
+        circle: {
+          value: listState[lastIndex].value || "",
+          state: ElementStates.Changing,
+          type: "bottom",
+        },
+      };
+      list.removeTail();
+
+      setListState([...listState]);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
+
+      listState.pop();
+      setListState([...listState]);
+    }
+    setIsLoading({ ...initialStateLoading, loadingRemTail: false });
   };
 
   const addByIndex = async () => {
@@ -165,35 +200,38 @@ export const ListPage: React.FC = () => {
       for (let i = 0; i <= inputIndex; i += 1) {
         listState[i] = {
           ...listState[i],
-          value: inputValue,
-          circleTop: "top",
           state: ElementStates.Changing,
+          circle: {
+            value: inputValue,
+            type: "top",
+            state: ElementStates.Changing,
+          },
         };
 
-        await delay(SHORT_DELAY_IN_MS);
+        await delay(SUPER_SHORT_DELAY_IN_MS);
         setListState([...listState]);
 
         if (i > 0) {
           listState[i - 1] = {
             ...listState[i - 1],
-            circleTop: undefined,
+            circle: undefined,
           };
         }
 
         setListState([...listState]);
       }
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
 
       listState[inputIndex] = {
         ...listState[inputIndex],
         state: ElementStates.Default,
-        circleTop: undefined,
+        circle: undefined,
       };
 
       listState.splice(inputIndex, 0, {
         value: inputValue,
         state: ElementStates.Modified,
-        circleTop: undefined,
+        circle: undefined,
       });
 
       setListState([...listState]);
@@ -202,8 +240,9 @@ export const ListPage: React.FC = () => {
       listState.forEach((item: ListType) => {
         item.state = ElementStates.Default;
       });
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
+      setInputIndex(Number(""));
       setIsLoading({ ...initialStateLoading, loadingAddByIndex: false });
     }
   };
@@ -213,7 +252,7 @@ export const ListPage: React.FC = () => {
 
     if (inputIndex) {
       try {
-        list.removeAt(inputIndex);
+        list.removeByIndex(inputIndex);
       } catch (error) {
         console.log(error);
         return;
@@ -223,16 +262,19 @@ export const ListPage: React.FC = () => {
           ...listState[i],
           state: ElementStates.Changing,
         };
-        await delay(SHORT_DELAY_IN_MS);
+        await delay(SUPER_SHORT_DELAY_IN_MS);
         setListState([...listState]);
       }
       listState[inputIndex] = {
         ...listState[inputIndex],
-        value: listState[inputIndex].value,
-        circleBottom: "bottom",
-        state: ElementStates.Changing,
+        value: "",
+        circle: {
+          value: listState[inputIndex].value,
+          type: "bottom",
+          state: ElementStates.Changing,
+        },
       };
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
 
       listState.splice(inputIndex, 1);
@@ -241,31 +283,25 @@ export const ListPage: React.FC = () => {
         ...listState[inputIndex - 1],
         state: ElementStates.Modified,
         value: listState[inputIndex - 1].value,
-        circleTop: undefined,
+        circle: null,
       };
 
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
       listState.forEach((item: ListType) => {
         item.state = ElementStates.Default;
       });
 
-      await delay(SHORT_DELAY_IN_MS);
+      await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
     }
-
-    setIsLoading({ ...initialStateLoading, loadingRemDyIndex: false });
-  };
-
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    setInputValue("");
     setInputIndex(Number(""));
+    setIsLoading({ ...initialStateLoading, loadingRemDyIndex: false });
   };
 
   return (
     <SolutionLayout title="Связный список">
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form className={styles.form}>
         <div className={styles.container}>
           <Input
             placeholder="Введите значение"
@@ -281,34 +317,32 @@ export const ListPage: React.FC = () => {
             type="submit"
             extraClass={styles.button_sml}
             onClick={addToHead}
-            // isLoader={isAdding}
-            //   disabled={!value || queue.length === 7}
+            isLoader={isLoading.loadingAddHead}
+            disabled={!inputValue}
           />
           <Button
             text="Добавить в tail"
             type="submit"
             extraClass={styles.button_sml}
             onClick={addToTail}
-            // isLoader={isAdding}
-            //  disabled={!value || queue.length === 7}
+            isLoader={isLoading.loadingAddTail}
+            disabled={!inputValue}
           />
           <Button
             text="Удалить из head"
             type="submit"
             extraClass={styles.button_sml}
             onClick={removeHead}
-            // isLoader={isRemoving}
-            // onClick={remove}
-            //  disabled={queue.isEmpty()}
+            isLoader={isLoading.loadingRemHead}
+            disabled={listState.length === 0}
           />
           <Button
             text="Удалить из tail"
             type="submit"
             extraClass={styles.button_sml}
             onClick={removeTail}
-            // isLoader={isRemoving}
-            // onClick={remove}
-            //  disabled={queue.isEmpty()}
+            isLoader={isLoading.loadingRemTail}
+            disabled={listState.length === 0}
           />
         </div>
         <div className={styles.container}>
@@ -326,40 +360,43 @@ export const ListPage: React.FC = () => {
             extraClass={styles.button_big}
             type="submit"
             onClick={addByIndex}
-            //  isLoader={isAdding}
-            // disabled={!value || queue.length === 7}
+            isLoader={isLoading.loadingAddByIndex}
+            disabled={!inputIndex || !inputValue}
           />
           <Button
             text="Удалить по индексу"
             type="submit"
             extraClass={styles.button_big}
             onClick={removeByIndex}
-            // isLoader={isRemoving}
-            //disabled={queue.isEmpty()}
+            isLoader={isLoading.loadingRemDyIndex}
+            disabled={!inputIndex}
           />
         </div>
       </form>
 
       <ul className={styles.container_result}>
-      {listState.map((item, index) => (
-            <li className={styles.circles} key={index}>
-              {item.circleTop && (
-                <Circle
-                  //extraClass={`${styles.listPage__littleCircle} ${styles[`listPage__littleCircle_${item.littleCircle.position}`]}`}
-                  letter={item.value}
-                  isSmall
-                  state={item.state}
-                />
-              )}
+        {listState.map((item, index) => (
+          <li className={styles.circles} key={index}>
+            {item.circle && (
               <Circle
-               // tail={(!item.littleCircle && index === listContainer.length - 1) ? 'tail' : ''}
-                letter={item.value}
-                index={index}
-                //head={!item.littleCircle && index === 0 ? 'head' : ''}
-                state={item.state}
+                extraClass={styles[item.circle.type]}
+                letter={item.circle.value}
+                isSmall
+                state={item.circle.state}
               />
-            </li>
-          ))}
+            )}
+            <Circle
+              tail={
+                !item.circle && index === listState.length - 1 ? "tail" : ""
+              }
+              letter={item.value}
+              index={index}
+              head={!item.circle && index === 0 ? "head" : ""}
+              state={item.state}
+            />
+            {index < listState.length - 1 && <ArrowIcon />}
+          </li>
+        ))}
       </ul>
     </SolutionLayout>
   );

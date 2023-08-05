@@ -28,8 +28,10 @@ export type QueueType<T> = {
 export type LinkedListType<T> = {
   append: (element: T) => void;
   insertAt: (element: T, position: number) => void;
-  getSize: () => number;
   print: () => void;
-  // findElement: (index: number) => void;
   removeAt: (index: number) => void;
+  removeHead: () => void;
+  removeTail: () => void;
+  removeByIndex: (index: number) => void;
+  getSize: () => number;
 };
