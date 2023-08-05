@@ -1,140 +1,193 @@
-import { useState, ChangeEvent, FormEvent, useMemo, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  MouseEvent,
+} from "react";
 import styles from "./sorting-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
-import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Direction } from "../../types/direction";
 import { Column } from "../ui/column/column";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { ElementStates } from "../../types/element-states";
-import { SUPER_SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
-import { delay } from "../../utils/index";
+import {
+  SHORT_DELAY_IN_MS,
+  DELAY_IN_MS,
+} from "../../utils/constants/delays";
+import { delay, randomArr, swap } from "../../utils/index";
 
-type QueueType = {
-  value: string;
+type SortType = {
+  value: number;
   state: ElementStates;
-  head?: string | React.ReactElement;
-  tail?: string | React.ReactElement;
 };
 
-type QueueInitType = { value: string; state: ElementStates };
+const sorting = {
+  select: "select",
+  bubble: "bubble",
+};
 
 export const SortingPage: React.FC = () => {
-  // const [value, setValue] = useState<string>("");
-  // const [isAdding, setIsAdding] = useState<boolean>(false);
-  // const [isRemoving, setIsRemoving] = useState<boolean>(false);
-  // const [queueState, setQueueState] = useState<(QueueType | null)[]>([]);
-  // const queue = useMemo(() => new LinkedList<QueueType>(7), []);
+  const [sortMethod, setSortMethod] = useState(sorting.bubble);
+  const [sort, setSort] = useState<SortType[]>([]);
 
-  // const initialQueue: QueueInitType = {
-  //   value: "",
-  //   state: ElementStates.Default,
-  // };
+  const [isSorting, setIsSorting] = useState<boolean>(false);
 
-  // const initialQueueCircles = useMemo(
-  //   () => queue.getElements().fill(initialQueue),
-  //   [queue]
-  // );
+  const minLen = 3;
+  const maxLen = 17;
+  const maxNum = 100;
 
-  // useEffect(() => {
-  //   setQueueState(initialQueueCircles);
-  // }, [initialQueueCircles]);
+  const newArray = () => {
+    setSort(randomArr(minLen, maxLen, maxNum));
+  };
 
-  // const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
-  //   setValue(evt.target.value);
-  // };
+  useEffect(() => {
+    setSort(randomArr(minLen, maxLen, maxNum));
+  }, []);
 
-  // const clear = () => {
-  //   queue.clear();
-  //   setQueueState([...queue.getElements()]);
-  // };
+  const bubbleSort = async (
+    arr: SortType[],
+    direction: Direction,
+    evt: MouseEvent<HTMLButtonElement>
+  ) => {
+    setIsSorting(true);
+    const { length } = arr;
+    if (arr.length === 0) {
+      return arr;
+    }
+    for (let i = 0; i < length; i++) {
+      for (let j = 0; j < length - i - 1; j++) {
+        arr[j].state = ElementStates.Changing;
+        arr[j + 1] && (arr[j + 1].state = ElementStates.Changing);
+        setSort([...arr]);
+        await delay(DELAY_IN_MS);
+        if (
+          direction === Direction.Ascending
+            ? arr[j].value > arr[j + 1].value
+            : arr[j].value < arr[j + 1].value
+        ) {
+          swap(arr, j, j + 1);
+        }
+        arr[j].state = ElementStates.Default;
+        arr[j + 1] && (arr[j + 1].state = ElementStates.Default);
+        setSort([...arr]);
+      }
 
-  // const remove = async () => {
-  //   setIsRemoving(true);
-  //   const head = queue.getTail();
-  //   const tail = queue.getHead();
-  //   if (head === tail) {
-  //     clear();
-  //     setIsRemoving(false);
-  //   } else {
-  //     const top = queue.peak();
-  //     top!.state = ElementStates.Changing;
-  //     setQueueState([...queue.getElements()]);
-  //     await delay(SUPER_SHORT_DELAY_IN_MS);
-  //     queue.dequeue();
-  //     setQueueState([...queue.getElements()]);
+      arr[length - i - 1].state = ElementStates.Modified;
+      setSort([...arr]);
+    }
+    setIsSorting(false);
+  };
 
-  //     setIsRemoving(false);
-  //   }
-  // };
+  const selectionSort = async (
+    arr: SortType[],
+    direction: Direction,
+    evt: MouseEvent<HTMLButtonElement>
+  ) => {
+    setIsSorting(true);
+    const { length } = arr;
+    if (length === 0) {
+      return arr;
+    }
+    for (let i = 0; i < length; i += 1) {
+      let minInd = i;
+      arr[minInd].state = ElementStates.Changing;
+      for (let j = i + 1; j < length; j += 1) {
+        arr[j].state = ElementStates.Changing;
+        setSort([...arr]);
+        await delay(SHORT_DELAY_IN_MS);
+        if (
+          direction === Direction.Ascending
+            ? arr[j].value < arr[minInd].value
+            : arr[j].value > arr[minInd].value
+        ) {
+          minInd = j;
+          arr[j].state = ElementStates.Changing;
+          arr[minInd].state =
+            i === minInd ? ElementStates.Changing : ElementStates.Default;
+        }
+        if (j !== minInd) arr[j].state = ElementStates.Default;
+        setSort([...arr]);
+      }
+      swap(arr, i, minInd);
 
-  // const add = async (value: string) => {
-  //   setIsAdding(true);
-  //   const container = queue.getElements();
-  //   const head = { value: value, state: ElementStates.Changing };
-  //   queue.enqueue(head);
-  //   setQueueState([...container]);
-  //   await delay(SUPER_SHORT_DELAY_IN_MS);
-  //   const element = container[queue.getTail()];
-  //   element!.state = ElementStates.Default;
-  //   setQueueState([...container]);
+      arr[minInd].state = ElementStates.Default;
+      arr[i].state = ElementStates.Modified;
+      setSort([...arr]);
+    }
+    setIsSorting(false);
+  };
 
-  //   setIsAdding(false);
-  // };
+  const asc = (evt: MouseEvent<HTMLButtonElement>) => {
+    if (sortMethod === sorting.bubble) {
+      bubbleSort(sort, Direction.Ascending, evt);
+    }
+    if (sortMethod === sorting.select) {
+      selectionSort(sort, Direction.Ascending, evt);
+    }
+  };
 
-  // const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-  //   evt.preventDefault();
-  //   add(value);
-  //   setValue("");
-  // };
+  const desc = (evt: MouseEvent<HTMLButtonElement>) => {
+    if (sortMethod === sorting.bubble) {
+      bubbleSort(sort, Direction.Descending, evt);
+    }
+    if (sortMethod === sorting.select) {
+      selectionSort(sort, Direction.Descending, evt);
+    }
+  };
 
   return (
     <SolutionLayout title="Сортировка массива">
       <form className={styles.form}>
         <RadioInput
-          // onChange={}
-          //checked={}
+          onChange={(event) =>
+            setSortMethod((event.target as HTMLInputElement).name)
+          }
+          checked={sortMethod === sorting.select}
+          name="select"
           label="Выбор"
-          //disabled={}
           extraClass="pr-20"
+          disabled={isSorting}
         />
         <RadioInput
-          // onChange={}
-          // checked={}
+          onChange={(event) =>
+            setSortMethod((event.target as HTMLInputElement).name)
+          }
+          checked={sortMethod === sorting.bubble}
           label="Пузырёк"
-          // disabled={}
           extraClass="pr-25"
+          name="bubble"
+          disabled={isSorting}
         />
         <Button
-          //isLoader={}
-          //onClick={}
+          onClick={(evt) => asc(evt)}
           type="button"
           text="По возрастанию"
           sorting={Direction.Ascending}
           extraClass={`${styles.button} mr-6`}
+          isLoader={isSorting}
         />
         <Button
-          // isLoader={}
-          // onClick={}
+          onClick={(evt) => desc(evt)}
           type="button"
           text="По убыванию"
           sorting={Direction.Descending}
           extraClass={`${styles.button} mr-40`}
+          isLoader={isSorting}
         />
         <Button
-          // isLoader={}
-          // onClick={}
+          onClick={newArray}
           text="Новый массив"
           extraClass={styles.button}
+          disabled={isSorting}
         />
       </form>
       <ul className={styles.columns}>
-        {/* {sort &&
-            sort.map((item, index) => (
-              <li key={index}>
-                <Column index={item.value} state={item.state} />
-              </li>
-            ))} */}
+        {sort &&
+          sort.map((item, index) => (
+            <li key={index}>
+              <Column index={item.value} state={item.state} />
+            </li>
+          ))}
       </ul>
     </SolutionLayout>
   );

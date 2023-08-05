@@ -190,12 +190,7 @@ export const ListPage: React.FC = () => {
     setIsLoading({ ...initialStateLoading, loadingAddByIndex: true });
 
     if (inputValue && inputIndex && inputIndex < listState.length) {
-      try {
-        list.insertAt(inputValue, inputIndex);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
+      list.insertAt(inputValue, inputIndex);
 
       for (let i = 0; i <= inputIndex; i += 1) {
         listState[i] = {
@@ -318,7 +313,7 @@ export const ListPage: React.FC = () => {
             extraClass={styles.button_sml}
             onClick={addToHead}
             isLoader={isLoading.loadingAddHead}
-            disabled={!inputValue}
+            disabled={!inputValue || listState.length === 7}
           />
           <Button
             text="Добавить в tail"
@@ -326,7 +321,7 @@ export const ListPage: React.FC = () => {
             extraClass={styles.button_sml}
             onClick={addToTail}
             isLoader={isLoading.loadingAddTail}
-            disabled={!inputValue}
+            disabled={!inputValue || listState.length === 7}
           />
           <Button
             text="Удалить из head"
@@ -352,7 +347,7 @@ export const ListPage: React.FC = () => {
             isLimitText={false}
             value={inputIndex}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setInputIndex(parseInt(e.target.value, 10));
+              setInputIndex(parseInt(e.target.value, 7));
             }}
           />
           <Button
@@ -361,7 +356,7 @@ export const ListPage: React.FC = () => {
             type="submit"
             onClick={addByIndex}
             isLoader={isLoading.loadingAddByIndex}
-            disabled={!inputIndex || !inputValue}
+            disabled={!inputIndex || !inputValue || listState.length === 7}
           />
           <Button
             text="Удалить по индексу"
