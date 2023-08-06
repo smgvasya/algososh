@@ -1,8 +1,4 @@
-import {
-  useState,
-  useEffect,
-  MouseEvent,
-} from "react";
+import { useState, useEffect, MouseEvent } from "react";
 import styles from "./sorting-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Button } from "../ui/button/button";
@@ -10,11 +6,8 @@ import { Direction } from "../../types/direction";
 import { Column } from "../ui/column/column";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { ElementStates } from "../../types/element-states";
-import {
-  SHORT_DELAY_IN_MS,
-  DELAY_IN_MS,
-} from "../../utils/constants/delays";
-import { delay, randomArr, swap } from "../../utils/index";
+import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../utils/constants/delays";
+import { delay, randomArr, swap, swapIndexState } from "../../utils/index";
 
 type SortType = {
   value: number;
@@ -56,8 +49,7 @@ export const SortingPage: React.FC = () => {
     }
     for (let i = 0; i < length; i++) {
       for (let j = 0; j < length - i - 1; j++) {
-        arr[j].state = ElementStates.Changing;
-        arr[j + 1] && (arr[j + 1].state = ElementStates.Changing);
+        swapIndexState([arr[j], arr[j + 1]], ElementStates.Changing);
         setSort([...arr]);
         await delay(DELAY_IN_MS);
         if (
@@ -67,12 +59,10 @@ export const SortingPage: React.FC = () => {
         ) {
           swap(arr, j, j + 1);
         }
-        arr[j].state = ElementStates.Default;
-        arr[j + 1] && (arr[j + 1].state = ElementStates.Default);
+        swapIndexState([arr[j], arr[j + 1]], ElementStates.Default);
         setSort([...arr]);
       }
-
-      arr[length - i - 1].state = ElementStates.Modified;
+      swapIndexState([arr[length - i - 1]], ElementStates.Modified);
       setSort([...arr]);
     }
     setIsSorting(false);
@@ -90,9 +80,11 @@ export const SortingPage: React.FC = () => {
     }
     for (let i = 0; i < length; i += 1) {
       let minInd = i;
-      arr[minInd].state = ElementStates.Changing;
+      swapIndexState([arr[minInd]], ElementStates.Changing);
+
       for (let j = i + 1; j < length; j += 1) {
-        arr[j].state = ElementStates.Changing;
+        swapIndexState([arr[j]], ElementStates.Changing);
+
         setSort([...arr]);
         await delay(SHORT_DELAY_IN_MS);
         if (
@@ -101,17 +93,19 @@ export const SortingPage: React.FC = () => {
             : arr[j].value > arr[minInd].value
         ) {
           minInd = j;
-          arr[j].state = ElementStates.Changing;
-          arr[minInd].state =
-            i === minInd ? ElementStates.Changing : ElementStates.Default;
+          swapIndexState([arr[j]], ElementStates.Changing);
+          if (minInd !== i) {
+            swapIndexState([arr[minInd]], ElementStates.Default);
+          }
         }
-        if (j !== minInd) arr[j].state = ElementStates.Default;
+        if (j !== minInd) {
+          swapIndexState([arr[j]], ElementStates.Default);
+        }
         setSort([...arr]);
       }
       swap(arr, i, minInd);
-
-      arr[minInd].state = ElementStates.Default;
-      arr[i].state = ElementStates.Modified;
+      swapIndexState([arr[minInd]], ElementStates.Default);
+      swapIndexState([arr[i]], ElementStates.Modified);
       setSort([...arr]);
     }
     setIsSorting(false);

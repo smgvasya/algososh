@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import styles from "./string.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
@@ -7,7 +7,7 @@ import { Circle } from "../ui/circle/circle";
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { ElementStates } from "../../types/element-states";
 import { StrReversType } from "../../types/types";
-import { swap, delay } from "../../utils/index";
+import { swap, delay, swapIndexState } from "../../utils/index";
 
 export const StringComponent: React.FC = () => {
   const [value, setValue] = useState<string>("");
@@ -27,16 +27,11 @@ export const StringComponent: React.FC = () => {
 
     while (start <= end) {
       await delay(DELAY_IN_MS);
-
-      arr[start].state = ElementStates.Changing;
-      arr[end].state = ElementStates.Changing;
+      swapIndexState([arr[start], arr[end]], ElementStates.Changing);
       setReverse([...arr]);
       await delay(SHORT_DELAY_IN_MS);
-
       swap(arr, start, end);
-
-      arr[start].state = ElementStates.Modified;
-      arr[end].state = ElementStates.Modified;
+      swapIndexState([arr[start], arr[end]], ElementStates.Modified);
       setReverse([...arr]);
       start++;
       end--;
@@ -53,6 +48,12 @@ export const StringComponent: React.FC = () => {
     reverseStr(value);
     setValue("");
   };
+
+  useEffect(() => {
+    return () => {
+      reverseStr(value);
+    };
+  }, []);
 
   return (
     <SolutionLayout title="Строка">

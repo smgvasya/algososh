@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useMemo } from "react";
+import { useState, ChangeEvent, FormEvent, useMemo, useEffect } from "react";
 import styles from "./stack-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
@@ -6,7 +6,7 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
 import { SUPER_SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
-import { delay } from "../../utils/index";
+import { delay, swapIndexState } from "../../utils/index";
 import { Stack } from "./Stack";
 
 type StackType = {
@@ -34,7 +34,7 @@ export const StackPage: React.FC = () => {
   const remove = async () => {
     setIsRemoving(true);
     const top = stack.peak();
-    top!.state = ElementStates.Changing;
+    swapIndexState([top!], ElementStates.Changing);
     await delay(SUPER_SHORT_DELAY_IN_MS);
     stack.pop();
     setStackState([...stack.getElements()]);
@@ -48,7 +48,7 @@ export const StackPage: React.FC = () => {
     setStackState([...stack.getElements()]);
     await delay(SUPER_SHORT_DELAY_IN_MS);
     const top = stack.peak();
-    top!.state = ElementStates.Default;
+    swapIndexState([top!], ElementStates.Default);
     setStackState([...stack.getElements()]);
     setIsAdding(false);
   };
@@ -58,6 +58,13 @@ export const StackPage: React.FC = () => {
     add(value);
     setValue("");
   };
+
+  useEffect(() => {
+    return () => {
+      add(value);
+      remove();
+    };
+  }, []);
 
   return (
     <SolutionLayout title="Стек">

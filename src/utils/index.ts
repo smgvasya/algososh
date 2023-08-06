@@ -7,11 +7,13 @@ const swap = (arr: StrReversType[] | number[], a: number, b: number): void => {
   arr[b] = temp;
 };
 
+const swapIndexState = (indexes: StrReversType[], state: ElementStates) => {
+  indexes.forEach((index) => (index.state = state));
+};
 
 const delay = (ms: number) => {
   return new Promise((res) => setTimeout(res, ms));
 };
-
 
 const randomArr = (minLen: number, maxLen: number, maxNum: number) => {
   const arr = [];
@@ -31,6 +33,4 @@ const randomArr = (minLen: number, maxLen: number, maxNum: number) => {
   return columns;
 };
 
-export { swap, delay, randomArr };
-
-
+export { swap, delay, randomArr, swapIndexState };

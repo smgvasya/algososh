@@ -6,7 +6,7 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
 import { SUPER_SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
-import { delay } from "../../utils/index";
+import { delay, swapIndexState } from "../../utils/index";
 import { Queue } from "./Queue";
 
 type QueueType = {
@@ -55,7 +55,7 @@ export const QueuePage: React.FC = () => {
       setIsRemoving(false);
     } else {
       const top = queue.peak();
-      top!.state = ElementStates.Changing;
+      swapIndexState([top!], ElementStates.Changing);
       setQueueState([...queue.getElements()]);
       await delay(SUPER_SHORT_DELAY_IN_MS);
       queue.dequeue();
@@ -73,7 +73,7 @@ export const QueuePage: React.FC = () => {
     setQueueState([...container]);
     await delay(SUPER_SHORT_DELAY_IN_MS);
     const element = container[queue.getTail()];
-    element!.state = ElementStates.Default;
+    swapIndexState([element!], ElementStates.Default);
     setQueueState([...container]);
 
     setIsAdding(false);
@@ -84,6 +84,13 @@ export const QueuePage: React.FC = () => {
     add(value);
     setValue("");
   };
+
+  useEffect(() => {
+    return () => {
+      add(value);
+      remove();
+    };
+  }, []);
 
   return (
     <SolutionLayout title="Очередь">

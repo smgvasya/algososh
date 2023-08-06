@@ -6,12 +6,8 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { ElementStates } from "../../types/element-states";
-import {
-  SUPER_SHORT_DELAY_IN_MS,
-  SHORT_DELAY_IN_MS,
-  DELAY_IN_MS,
-} from "../../utils/constants/delays";
-import { delay } from "../../utils/index";
+import { SUPER_SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
+import { delay, swapIndexState } from "../../utils/index";
 import { LinkedList } from "./LinkedList";
 
 type ListСircleType = {
@@ -56,6 +52,17 @@ export const ListPage: React.FC = () => {
     setListState([...arr]);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      addToHead();
+      addToTail();
+      removeHead();
+      removeTail();
+      addByIndex();
+      removeByIndex();
+    };
+  }, []);
+
   const addToHead = async () => {
     setIsLoading({ ...initialStateLoading, loadingAddHead: true });
     list.insertAt(inputValue, 0);
@@ -85,8 +92,7 @@ export const ListPage: React.FC = () => {
 
     setListState([...listState]);
     await delay(SUPER_SHORT_DELAY_IN_MS);
-
-    listState[0].state = ElementStates.Default;
+    swapIndexState([listState[0]], ElementStates.Default);
     setListState([...listState]);
     setInputValue("");
     setIsLoading({ ...initialStateLoading, loadingAddHead: false });
@@ -124,8 +130,7 @@ export const ListPage: React.FC = () => {
 
     setListState([...listState]);
     await delay(SUPER_SHORT_DELAY_IN_MS);
-
-    listState[length].state = ElementStates.Default;
+    swapIndexState([listState[length]], ElementStates.Default);
 
     setListState([...listState]);
     setInputValue("");
@@ -231,10 +236,8 @@ export const ListPage: React.FC = () => {
 
       setListState([...listState]);
 
-      listState[inputIndex].state = ElementStates.Default;
-      listState.forEach((item: ListType) => {
-        item.state = ElementStates.Default;
-      });
+      swapIndexState([listState[inputIndex]], ElementStates.Default);
+      swapIndexState(listState, ElementStates.Default);
       await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
       setInputIndex(Number(""));
@@ -283,10 +286,8 @@ export const ListPage: React.FC = () => {
 
       await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
-      listState.forEach((item: ListType) => {
-        item.state = ElementStates.Default;
-      });
 
+      swapIndexState(listState, ElementStates.Default);
       await delay(SUPER_SHORT_DELAY_IN_MS);
       setListState([...listState]);
     }

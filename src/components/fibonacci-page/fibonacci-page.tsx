@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import styles from "./fibonacci-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
@@ -6,27 +6,21 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { delay } from "../../utils/index";
+import { fibonacciCalc } from "./utils";
 
 export const FibonacciPage: React.FC = () => {
   const [value, setValue] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [fibonacci, setFibonacci] = useState<number[]>([]);
 
+  useEffect(() => {
+    return () => {
+      fibonacciRender(Number(value));
+    };
+  }, []);
+
   const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setValue(evt.target.value);
-  };
-
-  const fibonacciCalc = (index: number): number => {
-    if (index < 0) {
-      throw new Error("число не может быть меньше нуля");
-    }
-    if (index === 0) {
-      return 0;
-    }
-    if (index === 1) {
-      return 1;
-    }
-    return fibonacciCalc(index - 1) + fibonacciCalc(index - 2);
   };
 
   const fibonacciRender = async (index: number) => {
