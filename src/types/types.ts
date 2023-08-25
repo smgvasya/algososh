@@ -5,10 +5,10 @@ export type StrReversType = {
   state?: ElementStates;
 };
 
-// export type ReversType<T> = {
-//   item: T;
-//   state: ElementStates;
-// };
+export type ReversType<T> = {
+  item: T;
+  state: ElementStates;
+};
 
 export type StackType<T> = {
   push: (item: T) => void;

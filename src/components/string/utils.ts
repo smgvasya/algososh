@@ -1,13 +1,11 @@
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { ElementStates } from "../../types/element-states";
 import { swap, delay, swapIndexState } from "../../utils/index";
-import { StrReversType } from "../../types/types";
-
-// const elementState
+import { StrReversType, ReversType } from "../../types/types";
 
 export const reverseStr = async (
   str: string,
-  callback?: (arr: StrReversType[]) => void
+  callback?: (arr: ReversType<string>[]) => void
 ) => {
   const arr = str
     .split("")
@@ -29,4 +27,23 @@ export const reverseStr = async (
     start++;
     end--;
   }
+};
+
+export const swapTestStr= (arr: string[], a: number, b: number): void => {
+  const temp = arr[a];
+  arr[a] = arr[b];
+  arr[b] = temp;
+};
+
+export const reverseTestStr = (str: string): string[] => {
+  const arr = str.split("");
+  const { length } = arr;
+  let start = 0;
+  let end = length - 1;
+  while (start <= end) {
+    swapTestStr(arr, start, end);
+    start++;
+    end--;
+  }
+  return arr
 };
