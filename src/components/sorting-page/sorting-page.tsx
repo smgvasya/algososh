@@ -10,7 +10,7 @@ import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../utils/constants/delays";
 import { delay, randomArr, swap, swapIndexState } from "../../utils/index";
 
 type SortType = {
-  value: number;
+  item: number;
   state: ElementStates;
 };
 
@@ -54,8 +54,8 @@ export const SortingPage: React.FC = () => {
         await delay(DELAY_IN_MS);
         if (
           direction === Direction.Ascending
-            ? arr[j].value > arr[j + 1].value
-            : arr[j].value < arr[j + 1].value
+            ? arr[j].item > arr[j + 1].item
+            : arr[j].item < arr[j + 1].item
         ) {
           swap(arr, j, j + 1);
         }
@@ -78,19 +78,19 @@ export const SortingPage: React.FC = () => {
     if (length === 0) {
       return arr;
     }
-    for (let i = 0; i < length; i += 1) {
+    for (let i = 0; i < length; i ++) {
       let minInd = i;
       swapIndexState([arr[minInd]], ElementStates.Changing);
 
-      for (let j = i + 1; j < length; j += 1) {
+      for (let j = i + 1; j < length; j ++) {
         swapIndexState([arr[j]], ElementStates.Changing);
 
         setSort([...arr]);
         await delay(SHORT_DELAY_IN_MS);
         if (
           direction === Direction.Ascending
-            ? arr[j].value < arr[minInd].value
-            : arr[j].value > arr[minInd].value
+            ? arr[j].item < arr[minInd].item
+            : arr[j].item > arr[minInd].item
         ) {
           minInd = j;
           swapIndexState([arr[j]], ElementStates.Changing);
@@ -179,7 +179,7 @@ export const SortingPage: React.FC = () => {
         {sort &&
           sort.map((item, index) => (
             <li key={index}>
-              <Column index={item.value} state={item.state} />
+              <Column index={item.item} state={item.state} />
             </li>
           ))}
       </ul>

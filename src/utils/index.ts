@@ -25,8 +25,8 @@ const randomArr = (minLen: number, maxLen: number, maxNum: number) => {
     arr.push(Math.floor(Math.random() * (maxNum + 1)));
   }
 
-  const columns = arr.map((value) => ({
-    value,
+  const columns = arr.map((item) => ({
+    item,
     state: ElementStates.Default,
   }));
 

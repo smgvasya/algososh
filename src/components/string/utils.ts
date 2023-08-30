@@ -1,7 +1,7 @@
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../utils/constants/delays";
 import { ElementStates } from "../../types/element-states";
 import { swap, delay, swapIndexState } from "../../utils/index";
-import { StrReversType, ReversType } from "../../types/types";
+import { ReversType } from "../../types/types";
 
 export const reverseStr = async (
   str: string,
