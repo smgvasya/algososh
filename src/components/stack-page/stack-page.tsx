@@ -90,6 +90,7 @@ export const StackPage: React.FC = () => {
               isLoader={isRemoving}
               onClick={remove}
               disabled={!stackState.length}
+              data-cy={'remove'}
             />
           </div>
           <Button
@@ -97,6 +98,7 @@ export const StackPage: React.FC = () => {
             type="reset"
             onClick={clear}
             disabled={!stackState.length}
+            data-cy={'clear'}
           />
         </div>
       </form>
