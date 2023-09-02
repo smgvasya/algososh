@@ -116,6 +116,7 @@ export const QueuePage: React.FC = () => {
               isLoader={isRemoving}
               onClick={remove}
               disabled={queue.isEmpty()}
+              data-cy={'remove'}
             />
           </div>
           <Button
@@ -123,6 +124,7 @@ export const QueuePage: React.FC = () => {
             type="reset"
             onClick={clear}
             disabled={queue.isEmpty()}
+            data-cy={'clear'}
           />
         </div>
       </form>

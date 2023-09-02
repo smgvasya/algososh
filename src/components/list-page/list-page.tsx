@@ -307,6 +307,7 @@ export const ListPage: React.FC = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setInputValue(e.target.value);
             }}
+            data-cy={"value"}
           />
           <Button
             text="Добавить в head"
@@ -315,6 +316,7 @@ export const ListPage: React.FC = () => {
             onClick={addToHead}
             isLoader={isLoading.loadingAddHead}
             disabled={!inputValue || listState.length === 7}
+            data-cy={"addHead"}
           />
           <Button
             text="Добавить в tail"
@@ -323,6 +325,7 @@ export const ListPage: React.FC = () => {
             onClick={addToTail}
             isLoader={isLoading.loadingAddTail}
             disabled={!inputValue || listState.length === 7}
+            data-cy={"addTail"}
           />
           <Button
             text="Удалить из head"
@@ -331,6 +334,7 @@ export const ListPage: React.FC = () => {
             onClick={removeHead}
             isLoader={isLoading.loadingRemHead}
             disabled={listState.length === 0}
+            data-cy={"removeHead"}
           />
           <Button
             text="Удалить из tail"
@@ -339,6 +343,7 @@ export const ListPage: React.FC = () => {
             onClick={removeTail}
             isLoader={isLoading.loadingRemTail}
             disabled={listState.length === 0}
+            data-cy={"removeTail"}
           />
         </div>
         <div className={styles.container}>
@@ -350,6 +355,7 @@ export const ListPage: React.FC = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setInputIndex(parseInt(e.target.value, 7));
             }}
+            data-cy={"valueIndex"}
           />
           <Button
             text="Добавить по индексу"
@@ -358,6 +364,7 @@ export const ListPage: React.FC = () => {
             onClick={addByIndex}
             isLoader={isLoading.loadingAddByIndex}
             disabled={!inputIndex || !inputValue || listState.length === 7}
+            data-cy={"addIndex"}
           />
           <Button
             text="Удалить по индексу"
@@ -366,6 +373,7 @@ export const ListPage: React.FC = () => {
             onClick={removeByIndex}
             isLoader={isLoading.loadingRemDyIndex}
             disabled={!inputIndex}
+            data-cy={"removeIndex"}
           />
         </div>
       </form>

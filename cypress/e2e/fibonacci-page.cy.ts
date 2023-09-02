@@ -1,15 +1,14 @@
-import { isDisabledButton, changingArr, modefiedArr, circleClass } from "../utils-cy/index";
+import { isDisabledButton, circleClass, addValue } from "../utils-cy/index";
 
 describe("Тест для последовательности Фибоначи: ", () => {
   beforeEach(() => {
     cy.visit("http://localhost:3000/fibonacci");
   });
 
-  isDisabledButton()
+  isDisabledButton();
 
   it("числа генерируются корректно", () => {
-    cy.get("input").type(19);
-    cy.get("button").eq(1).click();
+    addValue(19, 1);
     cy.wait(10000);
     cy.get(circleClass)
 

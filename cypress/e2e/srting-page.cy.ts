@@ -1,4 +1,10 @@
-import { isDisabledButton, changingArr, modefiedArr, circleClass } from "../utils-cy/index";
+import {
+  isDisabledButton,
+  changingArr,
+  modefiedArr,
+  circleClass,
+  addValue,
+} from "../utils-cy/index";
 
 describe("Тест для последовательности Фибоначи: ", () => {
   beforeEach(() => {
@@ -8,8 +14,7 @@ describe("Тест для последовательности Фибоначи:
   isDisabledButton();
 
   it("строка разворачивается корректно", () => {
-    cy.get("input").type("test");
-    cy.get("button").eq(1).click();
+    addValue("test", 1);
 
     cy.get(circleClass)
       .should("have.length", 4)

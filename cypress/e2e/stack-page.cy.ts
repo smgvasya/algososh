@@ -4,7 +4,11 @@ import {
   circle,
   circleChanging,
   circleDefault,
+  addValue,
+  circleRemove,
+  circleClear,
 } from "../utils-cy/index";
+import { SHORT_DELAY_IN_MS } from "../../src/utils/constants/delays";
 
 describe("Тест для последовательности Фибоначи: ", () => {
   beforeEach(() => {
@@ -14,60 +18,54 @@ describe("Тест для последовательности Фибоначи:
   isDisabledButton();
 
   it("добавление элемента в стек", () => {
-    cy.get("input").clear();
-    cy.get("input").type(1);
-    cy.get("button").eq(1).click();
+    addValue(1, 1);
 
     cy.get(circleContent)
       .should("have.length", 1)
-      .each((el, index) => {
-        if (index === 0) cy.wrap(el).find(circleChanging);
+      .each((circle, index) => {
+        if (index === 0) cy.wrap(circle).find(circleChanging);
       });
 
     cy.get(circleContent)
       .should("have.length", 1)
-      .each((el, index) => {
-        if (index === 0) cy.wrap(el).find(circleDefault);
+      .each((circle, index) => {
+        if (index === 0) cy.wrap(circle).find(circleDefault);
       });
 
-    cy.get("input").type(2);
-    cy.get("button").eq(1).click();
+    addValue(2, 1);
 
     cy.get(circleContent)
       .should("have.length", 2)
-      .each((el, index) => {
-        if (index === 0) cy.wrap(el).find(circleDefault);
-        if (index === 1) cy.wrap(el).find(circleChanging);
+      .each((circle, index) => {
+        if (index === 0) cy.wrap(circle).find(circleDefault);
+        if (index === 1) cy.wrap(circle).find(circleChanging);
       });
 
     cy.get(circleContent)
       .should("have.length", 2)
-      .each((el, index) => {
-        if (index === 0 || index === 1) cy.wrap(el).find(circleDefault);
+      .each((circle, index) => {
+        if (index === 0 || index === 1) cy.wrap(circle).find(circleDefault);
       });
   });
 
   it("удаление элемента из стека", () => {
     for (let i = 0; i < 4; i++) {
-      cy.get("input").type(`${i}`);
-      cy.get("button").eq(1).click();
-      cy.wait(500);
+      addValue(`${i}`, 1);
+      cy.wait(SHORT_DELAY_IN_MS);
     }
     for (let i = 3; i >= 0; i--) {
-      cy.wait(500);
-      cy.get('[data-cy="remove"]').click();
+      cy.wait(SHORT_DELAY_IN_MS);
+      cy.get(circleRemove).click();
     }
   });
 
   it("поведение кнопки «Очистить»", () => {
     for (let i = 0; i < 8; i++) {
-      cy.get("input").type(`${i}`);
-      cy.get("button").eq(1).click();
-      i++;
-      cy.wait(500);
+      addValue(`${i}`, 1);
+      cy.wait(SHORT_DELAY_IN_MS);
     }
 
-    cy.get('[data-cy="clear"]').click();
+    cy.get(circleClear).click();
     cy.get(circle).should("have.length", 0);
   });
 });
